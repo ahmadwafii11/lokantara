@@ -38,6 +38,12 @@ function Navbar() {
                         </NavLink>
                     </li>
                     <li>
+                        <NavLink to="/komunitas"
+                        >
+                            <span className="hover: text-red-500">Komunitas</span>
+                        </NavLink>
+                    </li>
+                    <li>
                         <NavLink to="/tentangkami"
                         >
                             <span className="hover: text-red-500">TentangKami</span>
