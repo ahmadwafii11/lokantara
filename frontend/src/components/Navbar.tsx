@@ -43,7 +43,7 @@ function Navbar() {
     ];
 
     return (
-        <nav className="sticky top-0 z-50 border-b border-white/10 bg-gray-950/70 backdrop-blur-xl">
+        <nav className="sticky top-0 z-50 border-b border-white/10 bg-blue-500/70 backdrop-blur-xl">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
 
@@ -55,7 +55,7 @@ function Navbar() {
                             to="/"
                             className="flex items-center gap-2"
                         >
-                            <div className="rounded-xl bg-indigo-500 p-2">
+                            <div className="rounded-xl bg-yellow-300 p-2">
                                 <Train className="h-5 w-5 text-white" />
                             </div>
 
@@ -64,7 +64,7 @@ function Navbar() {
                                     Lokantara
                                 </h1>
 
-                                <p className="text-[10px] text-gray-400">
+                                <p className="text-[10px] text-gray-100">
                                     Smart Public Journey
                                 </p>
                             </div>
@@ -81,8 +81,8 @@ function Navbar() {
                                         
                                         ${
                                             isActive
-                                                ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
-                                                : "text-gray-300 hover:bg-white/5 hover:text-white"
+                                                ? "bg-yellow-300 text-white"
+                                                : "text-white hover:bg-yellow-100/50 hover:text-white"
                                         }`
                                     }
                                 >
@@ -188,7 +188,7 @@ function Navbar() {
                                     
                                     ${
                                         isActive
-                                            ? "bg-indigo-500 text-white"
+                                            ? "bg-yellow-300 text-white"
                                             : "text-gray-300 hover:bg-white/5 hover:text-white"
                                     }`
                                 }
