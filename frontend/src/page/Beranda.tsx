@@ -1,0 +1,38 @@
+import { Link } from "react-router-dom";
+import "../index.css";
+import imageBackground from "../assets/background.jpeg";
+
+function Beranda() {
+    return (
+        <div
+            className="relative h-screen w-full bg-cover bg-center"
+            style={{
+                backgroundImage: `url(${imageBackground})`,
+            }}
+        >
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/60" />
+
+            {/* Content */}
+            <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
+                
+                <h1 className="font-outfit text-5xl font-bold md:text-7xl">
+                    Lokantara
+                </h1>
+
+                <p className="mt-4 max-w-2xl text-lg text-gray-200 md:text-xl">
+                    Eksplorasi tempat wisata jadi mudah dengan
+                    terintegrasi transportasi publik
+                </p>
+
+                <Link to="/eksplorasi"
+                      className="mt-8 rounded-2xl bg-yellow-300 px-6 py-3 font-medium text-white transition hover:bg-yellow-500"
+                >
+                    <span>Mulai Eksplorasi</span>
+                </Link>
+            </div>
+        </div>
+    )
+}
+
+export default Beranda

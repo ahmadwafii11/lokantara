@@ -1,17 +1,19 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
+import Beranda from "../page/Beranda";
+
 function AppRoutes() {
     return(
         <BrowserRouter>
             <Navbar/>
             <Routes>
-                {/* <Route
+                <Route
                 path="/"
                 element={
-                    <Home/>
+                    <Beranda/>
                 }
-                /> */}
+                />
             </Routes>
         </BrowserRouter>
     )
