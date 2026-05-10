@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 import Beranda from "../page/Beranda";
+import Eksplorasi from "../page/Eksplorasi";
 
 function AppRoutes() {
     return(
@@ -12,6 +13,12 @@ function AppRoutes() {
                 path="/"
                 element={
                     <Beranda/>
+                }
+                />
+                <Route
+                path="/eksplorasi"
+                element={
+                    <Eksplorasi/>
                 }
                 />
             </Routes>
