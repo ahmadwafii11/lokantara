@@ -20,7 +20,7 @@ function Beranda() {
                     Lokantara
                 </h1>
 
-                <p className="mt-4 max-w-2xl text-lg text-gray-200 md:text-xl">
+                <p className="mt-4 max-w-2xl text-lg text-gray-200 md:text-xl hover:text-yellow-400">
                     Eksplorasi tempat wisata jadi mudah dengan
                     terintegrasi transportasi publik
                 </p>
