@@ -9,6 +9,7 @@ import {
     Heart,
     Users,
     Route,
+    CircleUser
 } from "lucide-react";
 
 function Navbar() {
@@ -96,33 +97,28 @@ function Navbar() {
                     <div className="flex items-center gap-3">
 
                         {/* ICON BUTTONS */}
-                        <button className="hidden sm:flex rounded-xl p-2 text-gray-300 hover:bg-white/5 hover:text-white transition">
+                        {/* <button className="hidden sm:flex rounded-xl p-2 text-gray-300 hover:bg-white/5 hover:text-white transition">
                             <MapPinned className="h-5 w-5" />
                         </button>
 
                         <button className="hidden sm:flex rounded-xl p-2 text-gray-300 hover:bg-white/5 hover:text-white transition">
                             <Bell className="h-5 w-5" />
-                        </button>
-
-                        {/* PROFILE */}
+                        </button> */}
                         <div className="relative">
-                            <button
+                            {/* PROFILE */}
+                            <button 
                                 onClick={() =>
                                     setProfileMenu(!profileMenu)
                                 }
-                                className="flex items-center"
+                                className="hidden sm:flex items-center rounded-full p-2 text-white hover:bg-yellow-400/5 hover:text-yellow-400 transition object-cover"
                             >
-                                <img
-                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
-                                    alt="profile"
-                                    className="h-10 w-10 rounded-full border border-white/10 object-cover"
-                                />
+                                <CircleUser className="h-8 w-8" />
                             </button>
 
                             {/* DROPDOWN */}
                             {profileMenu && (
                                 <div className="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border border-white/10 bg-gray-900/95 backdrop-blur-xl shadow-2xl">
-                                    <div className="border-b border-white/10 p-4">
+                                    {/* <div className="border-b border-white/10 p-4">
                                         <h3 className="font-semibold text-white">
                                             Ahmad Wafi
                                         </h3>
@@ -130,10 +126,10 @@ function Navbar() {
                                         <p className="text-sm text-gray-400">
                                             ahmad@email.com
                                         </p>
-                                    </div>
+                                    </div> */}
 
                                     <div className="p-2">
-                                        <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white">
+                                        {/* <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white">
                                             <Users className="h-4 w-4" />
                                             Profil Saya
                                         </button>
@@ -148,10 +144,10 @@ function Navbar() {
                                             Favorit
                                         </button>
 
-                                        <hr className="my-2 border-white/10" />
+                                        <hr className="my-2 border-white/10" /> */}
 
-                                        <button className="flex w-full items-center rounded-xl px-4 py-3 text-sm text-red-400 hover:bg-red-500/10">
-                                            Logout
+                                        <button className="flex w-full items-center rounded-xl px-4 py-3 text-sm text-green-400 hover:bg-green-500/10">
+                                            Login
                                         </button>
                                     </div>
                                 </div>
@@ -196,6 +192,10 @@ function Navbar() {
                                 {item.name}
                             </NavLink>
                         ))}
+                        <hr className="my-2 border-white/10" />
+                        <button className="flex w-full items-center rounded-xl px-4 py-3 text-sm text-green-400 hover:bg-green-500/10">
+                            Login
+                        </button>
                     </div>
                 </div>
             )}
