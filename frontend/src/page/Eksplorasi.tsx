@@ -38,7 +38,7 @@ function Eksplorasi() {
                 style={{ backgroundImage: `url(${imageBackground})` }}
             >
                 {/* Overlay agar teks terbaca dan menyatu ke bawah */}
-                <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/60 via-indigo-950/40 to-white" />
+                <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/80 via-indigo-950/40 via-[60%] to-white" />
 
                 <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 md:py-0 w-full">
                     <div className="max-w-3xl">
@@ -71,7 +71,7 @@ function Eksplorasi() {
                             {filters.map((filter) => (
                                 <button
                                     key={filter.name}
-                                    className="flex flex-shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-yellow-400 hover:text-black"
+                                    className="flex flex-shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-yellow-400 hover:text-black drop-shadow-lg"
                                 >
                                     {filter.icon}
                                     {filter.name}
