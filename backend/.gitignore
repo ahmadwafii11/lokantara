@@ -1,5 +1,29 @@
-node_modules
-# Keep environment variables out of version control
-.env
+# Dependency folders
+node_modules/
 
-/generated/prisma
+# Environment variables (SANGAT PENTING: jangan biarkan database URL terunggah)
+.env
+.env.test
+.env.local
+
+# TypeScript / Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Prisma
+# Mengabaikan file SQLite jika kamu menggunakannya untuk testing lokal
+/prisma/*.db
+/prisma/*.db-journal
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Editor folders
+.vscode/
+.idea/
+.DS_Store
