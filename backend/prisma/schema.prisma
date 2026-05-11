@@ -1,13 +1,91 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Region {
+  id Int @id @default(autoincrement())
+
+  regionName String? @map("region_name")
+    @db.VarChar(100)
+
+  regionType String? @map("region_type")
+    @db.VarChar(50)
+
+  province String? @db.VarChar(100)
+
+  destinations TouristDestination[]
+
+  @@map("regions")
+}
+
+model TourismCategory {
+  id Int @id @default(autoincrement())
+
+  categoryName String @map("category_name")
+    @db.VarChar(100)
+
+  destinations TouristDestination[]
+
+  @@map("tourism_category")
+}
+
+model DestinationOperatingHour {
+  id Int @id @default(autoincrement())
+
+  destinationId Int @map("destination_id")
+
+  dayOfWeek Int @map("day_of_week")
+
+  openTime DateTime? @map("open_time") @db.Time(0)
+  closeTime DateTime? @map("close_time") @db.Time(0)
+
+  isClosed Boolean @default(false) @map("is_closed")
+
+  is24Hours Boolean @default(false) @map("is_24_hours")
+
+  destination TouristDestination
+    @relation(fields: [destinationId], references: [id])
+
+  @@map("destination_operating_hours")
+}
+
+model TouristDestination {
+  id Int @id @default(autoincrement())
+
+  regionId Int @map("region_id")
+  categoryId Int @map("category_id")
+
+  name String @db.VarChar(255)
+
+  slug String @unique @db.VarChar(255)
+
+  description String? @db.Text
+
+  address String? @db.Text
+
+  latitude Decimal? @db.Decimal(10, 8)
+  longitude Decimal? @db.Decimal(11, 8)
+
+  location Unsupported("geography(Point, 4326)")?
+
+  createdAt DateTime @default(now())
+    @map("created_at")
+
+  updatedAt DateTime @updatedAt
+    @map("updated_at")
+
+  region Region
+    @relation(fields: [regionId], references: [id])
+
+  category TourismCategory
+    @relation(fields: [categoryId], references: [id])
+
+  operatingHours DestinationOperatingHour[]
+
+  @@map("tourist_destinations")
 }
