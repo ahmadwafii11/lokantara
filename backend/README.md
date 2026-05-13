@@ -8,3 +8,9 @@ indonesian trip connected by public transportation
 - ctrl + a --> y
 - pnpm install
 - pnpm prisma init
+- pnpm exec prisma -v (cek version prisma)
+- pnpm prisma generate (generate prisma)
+- pnpm prisma migrate dev --name init (migrate prisma)
+- pnpm prisma studio (open prisma studio localhost)
+- pnpm add -D @types/cors
+- pnpm dev
