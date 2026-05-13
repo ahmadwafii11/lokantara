@@ -1,20 +1,22 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
 }
+
+///table regions
 
 model Region {
   id Int @id @default(autoincrement())
 
-  regionName String? @map("region_name")
-    @db.VarChar(100)
+  regionName String? @map("region_name") @db.VarChar(100)
 
-  regionType String? @map("region_type")
-    @db.VarChar(50)
+  regionType String? @map("region_type") @db.VarChar(50)
 
   province String? @db.VarChar(100)
 
@@ -23,16 +25,19 @@ model Region {
   @@map("regions")
 }
 
+//table tourism_category
+
 model TourismCategory {
   id Int @id @default(autoincrement())
 
-  categoryName String @map("category_name")
-    @db.VarChar(100)
+  categoryName String @map("category_name") @db.VarChar(100)
 
   destinations TouristDestination[]
 
   @@map("tourism_category")
 }
+
+///table destination_operating_hours
 
 model DestinationOperatingHour {
   id Int @id @default(autoincrement())
@@ -41,23 +46,24 @@ model DestinationOperatingHour {
 
   dayOfWeek Int @map("day_of_week")
 
-  openTime DateTime? @map("open_time") @db.Time(0)
+  openTime  DateTime? @map("open_time") @db.Time(0)
   closeTime DateTime? @map("close_time") @db.Time(0)
 
   isClosed Boolean @default(false) @map("is_closed")
 
   is24Hours Boolean @default(false) @map("is_24_hours")
 
-  destination TouristDestination
-    @relation(fields: [destinationId], references: [id])
+  destination TouristDestination @relation(fields: [destinationId], references: [id])
 
   @@map("destination_operating_hours")
 }
 
+///table tourist_destinations
+
 model TouristDestination {
   id Int @id @default(autoincrement())
 
-  regionId Int @map("region_id")
+  regionId   Int @map("region_id")
   categoryId Int @map("category_id")
 
   name String @db.VarChar(255)
@@ -68,24 +74,75 @@ model TouristDestination {
 
   address String? @db.Text
 
-  latitude Decimal? @db.Decimal(10, 8)
+  latitude  Decimal? @db.Decimal(10, 8)
   longitude Decimal? @db.Decimal(11, 8)
 
   location Unsupported("geography(Point, 4326)")?
 
-  createdAt DateTime @default(now())
-    @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  updatedAt DateTime @updatedAt
-    @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  region Region
-    @relation(fields: [regionId], references: [id])
+  region Region @relation(fields: [regionId], references: [id])
 
-  category TourismCategory
-    @relation(fields: [categoryId], references: [id])
+  category TourismCategory @relation(fields: [categoryId], references: [id])
 
-  operatingHours DestinationOperatingHour[]
+  operatingHours          DestinationOperatingHour[]
+  destinationTicketPrices DestinationTicketPrice[]
+  images      DestinationImage[]
 
   @@map("tourist_destinations")
+}
+
+///table ticket_types
+
+model TicketType {
+  id             Int    @id @default(autoincrement())
+  ticketTypeName String @unique @map("ticket_type_name") @db.VarChar(100)
+
+  // Relasi balik ke harga
+  ticketPrices DestinationTicketPrice[]
+
+  @@map("ticket_types")
+}
+
+///table destination_ticket_prices
+
+model DestinationTicketPrice {
+  id            Int @id @default(autoincrement())
+  destinationId Int @map("destination_id")
+  ticketTypeId  Int @map("ticket_type_id")
+
+  price Decimal @db.Decimal(12, 2)
+
+  validFrom  DateTime? @default(now()) @map("valid_from") @db.Date
+  validUntil DateTime? @map("valid_until") @db.Date
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relasi
+  destination TouristDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  ticketType  TicketType         @relation(fields: [ticketTypeId], references: [id], onDelete: Restrict)
+
+  // Constraint agar tidak ada harga ganda
+  @@unique([destinationId, ticketTypeId, validFrom])
+  @@map("destination_ticket_prices")
+}
+
+/// table destination_images
+
+model DestinationImage {
+  id Int @id @default(autoincrement())
+
+  destinationId Int @map("destination_id")
+
+  imageUrl String @map("image_url")
+
+  isThumbnail Boolean @default(false) @map("is_thumbnail")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  destination TouristDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@map("destination_images")
 }
