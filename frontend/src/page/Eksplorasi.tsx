@@ -61,7 +61,7 @@ function Eksplorasi() {
                             Eksplorasi Wisata
                         </h1>
 
-                        <p className="mt-6 text-lg text-gray-200 md:text-xl">
+                        <p className="mt-6 text-lg text-gray-200 md:text-xl hover:text-yellow-400">
                             Temukan destinasi wisata terbaik dengan
                             integrasi transportasi publik yang mudah
                             dan efisien.
