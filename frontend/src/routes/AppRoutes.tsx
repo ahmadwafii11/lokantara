@@ -21,6 +21,12 @@ function AppRoutes() {
                     <Eksplorasi/>
                 }
                 />
+                <Route
+                path="/eksplorasi/category/:filter"
+                element={
+                    <Eksplorasi />
+                }
+                />
             </Routes>
         </BrowserRouter>
     )

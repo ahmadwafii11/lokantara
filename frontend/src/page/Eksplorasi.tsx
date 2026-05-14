@@ -1,28 +1,42 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { Search, MapPin, Landmark, TreePine, Trees, Volleyball, Mountain, VenetianMask } from "lucide-react";
+import { Search, MapPin, Landmark, TreePine, Trees, Volleyball, Mountain, VenetianMask, Shapes } from "lucide-react";
 
 import imageBackground from "../assets/background.jpeg";
 
 function Eksplorasi() {
 
     const [destinations, setDestinations] = useState<any[]>([]);
+    const [filters, setFilters] = useState<any[]>([]);
+    const navigate = useNavigate();
+    const iconMap: Record<string, JSX.Element> = {
+        Museum: <Landmark className="h-4 w-4"/>,
+        Monumen: <Landmark className="h-4 w-4"/>,
+        Alam: <Trees className="h-4 w-4"/>,
+        Taman: <TreePine className="h-4 w-4"/>,
+        Pantai: <Volleyball className="h-4 w-4"/>,
+        Gunung: <Mountain className="h-4 w-4"/>,
+        Budaya: <VenetianMask className="h-4 w-4"/>
+    }
+    const { filter } = useParams()
 
+    // useEffect for filter button
     useEffect(() => {
-        fetch("http://localhost:3000/api/destinations")
+        fetch("http://localhost:3000/api/tourismcategories")
             .then((res) => res.json())
-            .then((data) => setDestinations(data));
-    }, []);
+            .then((data) => setFilters(data));
+    }, [])
 
-    const filters = [
-        { name: "Museum", icon: <Landmark className="h-4 w-4" /> },
-        { name: "Monumen", icon: <Landmark className="h-4 w-4" /> },
-        { name: "Alam", icon: <Trees className="h-4 w-4" /> },
-        { name: "Taman", icon: <TreePine className="h-4 w-4" /> },
-        { name: "Pantai", icon: <Volleyball className="h-4 w-4" /> },
-        { name: "Gunung", icon: <Mountain className="h-4 w-4" /> },
-        { name: "Budaya", icon: <VenetianMask className="h-4 w-4" /> },
-    ];
+    // useEffect for section destinations
+    useEffect(() => {
+        const url =  filter
+            ? `http://localhost:3000/api/destinations/tourismcategories/${filter}`
+            : "http://localhost:3000/api/destinations"
+        fetch(url)
+            .then((res)  => res.json())
+            .then((data) => setDestinations(data))
+    }, [filter]);
 
     return (
         <div className="min-h-screen bg-white">
@@ -71,12 +85,21 @@ function Eksplorasi() {
 
                         {/* FILTERS */}
                         <div className="mt-8 flex flex-wrap gap-3 overflow-x-auto pb-4">
-                            {filters.map((filter) => (
+                            {filters.map((filter: any) => (
                                 <button
-                                    key={filter.name}
+                                    key={filter.id}
+                                    onClick={() => 
+                                        navigate(
+                                            `/eksplorasi/category/${filter.categoryName.toLowerCase()}`
+                                        )
+                                    }
                                     className="flex flex-shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-yellow-400 hover:text-black">
-                                    {filter.icon}
-                                    {filter.name}
+                                    {
+                                        iconMap[filter.categoryName]
+                                        ||
+                                        <Shapes className="h4-w-4"/>
+                                    }
+                                    {filter.categoryName}
                                 </button>
                             ))}
                         </div>
