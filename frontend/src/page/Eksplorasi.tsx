@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, JSX } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Search, MapPin, Landmark, TreePine, Trees, Volleyball, Mountain, VenetianMask, Shapes } from "lucide-react";
@@ -161,7 +161,15 @@ function Eksplorasi() {
                                             }
                                         </p>
                                     </div>
-                                    <button className="mt-6 w-full rounded-xl bg-gray-50 py-3 font-semibold text-gray-900 transition hover:bg-yellow-400">
+                                    <button 
+                                        key={destination.id}
+                                        onClick={() =>
+                                            navigate(
+                                                `/eksplorasi/${destination.slug}`
+                                            )
+                                        }
+                                        className="mt-6 w-full rounded-xl bg-gray-50 py-3 font-semibold text-gray-900 transition hover:bg-yellow-400"
+                                    >
                                         Lihat Detail
                                     </button>
                                 </div>

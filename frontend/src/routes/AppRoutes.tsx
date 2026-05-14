@@ -3,6 +3,9 @@ import Navbar from "../components/Navbar";
 
 import Beranda from "../page/Beranda";
 import Eksplorasi from "../page/Eksplorasi";
+import EksplorasiDetail from "../page/EksplorasiDetail";
+
+import Disclaimer from "../components/Disclaimer";
 
 function AppRoutes() {
     return(
@@ -25,6 +28,15 @@ function AppRoutes() {
                 path="/eksplorasi/category/:filter"
                 element={
                     <Eksplorasi />
+                }
+                />
+                <Route
+                path="/eksplorasi/:slug"
+                element={
+                    <>
+                        <EksplorasiDetail />
+                        <Disclaimer />
+                    </>
                 }
                 />
             </Routes>
