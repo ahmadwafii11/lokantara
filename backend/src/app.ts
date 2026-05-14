@@ -5,6 +5,7 @@ import path from "path"
 import { fileURLToPath } from "url"
 
 import destinationRoutes from "./routes/destination.routes"
+import tourismCategoryRoutes from "./routes/tourismCategory.routes"
 
 const app = express()
 
@@ -16,7 +17,7 @@ app.use(cors())
 
 app.use(express.json())
 
-// STATIC IMAGE
+// STATIC IMAGE DESTINATIONS
 app.use(
     "/images/destinations",
     express.static(
@@ -24,7 +25,10 @@ app.use(
     )
 )
 
-// API ROUTE
+// API ROUTE DESTINATIONS
 app.use("/api/destinations", destinationRoutes)
+
+// API ROUTE TOURISM CATEGORY
+app.use("/api/tourismcategories", tourismCategoryRoutes)
 
 export default app
