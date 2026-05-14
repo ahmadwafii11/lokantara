@@ -50,4 +50,32 @@ router.get(
     }
 )
 
+// API Slug Destinations
+router.get("/:slug", async (req, res) => {
+
+    const { slug } = req.params
+
+    const destination =
+        await prisma.touristDestination.findUnique({
+
+            where: {
+                slug,
+            },
+
+            include: {
+                images: true,
+                region: true,
+                category: true,
+                operatingHours: true,
+                destinationTicketPrices: {
+                    include: {
+                        ticketType: true,
+                    },
+                },
+            },
+        })
+
+    res.json(destination)
+})
+
 export default router
