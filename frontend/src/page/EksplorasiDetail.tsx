@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { MapPin, Info } from "lucide-react";
+import { MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import Loading from "../components/Loading";
@@ -9,6 +9,7 @@ function EksplorasiDetail() {
     const { slug } = useParams();
     const [destination, setDestination] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [currentImage, setCurrentImage] = useState(0)
 
     // UseEffect for Destinations
     useEffect(() => {
@@ -50,47 +51,97 @@ function EksplorasiDetail() {
         )
     }
 
-    const image = destination.images?.[0];
+    const images = destination.images || []
+
+    const nextImage = () => {
+        setCurrentImage((prev) =>
+            prev === images.length - 1 ? 0 : prev + 1
+        )
+    }
+
+    const prevImage = () => {
+        setCurrentImage((prev) =>
+            prev === 0 ? images.length - 1 : prev - 1
+        )
+    }
 
     return (
         <div className="min-h-screen bg-white">
 
             {/* HERO IMAGE */}
-            <div className="relative h-[500px] w-full">
+            <div className="relative h-[500px] w-full overflow-hidden">
                 <img
-                    src={
-                        image
-                            ? `http://localhost:3000${image.imageUrl}`
-                            : "https://placehold.co/1200x800"
-                    }
+                    src={`http://localhost:3000${images[currentImage]?.imageUrl}`}
                     alt={destination.name}
                     className="h-full w-full object-cover"
                 />
 
+                {/* OVERLAY */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                <div className="absolute bottom-10 left-1/2 w-full max-w-7xl -translate-x-1/2 px-6">
-                    <h1 className="font-outfit text-4xl font-bold text-white md:text-6xl">
-                        {destination.name}
-                    </h1>
 
-                    <div className="mt-4 flex items-center gap-2 text-gray-200">
-                        <MapPin className="h-5 w-5" />
-                        <p className="hover:text-yellow-400">
-                            {
-                                destination.region
-                                    ?.regionName
-                            }
-                            ,{" "}
-                            {
-                                destination.region
-                                    ?.province
-                            }
-                        </p>
+                {/* BUTTON LEFT */}
+                {images.length > 1 && (
+                    <button
+                        onClick={prevImage}
+                        className="absolute left-6 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white backdrop-blur-md transition hover:bg-black/60"
+                    >
+                        <ChevronLeft className="h-6 w-6" />
+                    </button>
+                )}
+
+                {/* BUTTON RIGHT */}
+                {images.length > 1 && (
+                    <button
+                        onClick={nextImage}
+                        className="absolute right-6 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white backdrop-blur-md transition hover:bg-black/60"
+                    >
+                        <ChevronRight className="h-6 w-6" />
+                    </button>
+                )}
+
+                <div className="absolute bottom-10 left-1/2 w-full max-w-7xl -translate-x-1/2 px-6">
+                    {/* CONTENT HEADER IMAGE */}
+                    <div className="absolute bottom-0 left-0 z-10 w-full p-8 md:p-16">
+                        <div className="mx-auto max-w-7xl">
+                            <h1 className="font-outfit text-4xl font-bold text-white md:text-6xl">
+                                {destination.name}
+                            </h1>
+
+                            <div className="mt-4 flex items-center gap-2 text-gray-200">
+                                <MapPin className="h-5 w-5 text-red-400" />
+                                <p>
+                                    {destination.region?.regionName},{" "}
+                                    {destination.region?.province}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            {/* THUMBNAILS */}
+            {images.length > 1 && (
+                <div className="mx-auto -mt-10 flex max-w-7xl gap-4 overflow-x-auto px-6 pb-4 relative z-20">
+                    {images.map((image: any, index: number) => (
+                        <button
+                            key={image.id}
+                            onClick={() => setCurrentImage(index)}
+                            className={`overflow-hidden rounded-2xl border-4 transition ${currentImage === index
+                                    ? "border-yellow-400"
+                                    : "border-transparent opacity-70 hover:opacity-100"
+                                }`}
+                        >
+                            <img
+                                src={`http://localhost:3000${image.imageUrl}`}
+                                alt={destination.name}
+                                className="h-24 w-40 object-cover"
+                            />
+                        </button>
+                    ))}
+                </div>
+            )}
 
-            {/* CONTENT */}
+            {/* CONTENT DESTINATIONS*/}
             <div className="mx-auto max-w-5xl px-6 py-16">
                 <div className="grid gap-8 lg:grid-cols-3">
 
