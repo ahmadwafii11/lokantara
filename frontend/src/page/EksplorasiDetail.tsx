@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, MapPinned, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import Loading from "../components/Loading";
+import MapView from "../components/MapView";
 
 function EksplorasiDetail() {
     const { slug } = useParams();
@@ -118,7 +119,7 @@ function EksplorasiDetail() {
                     </div>
                 </div>
             </div>
-            
+
             {/* THUMBNAILS */}
             {images.length > 1 && (
                 <div className="mx-auto -mt-10 flex max-w-7xl gap-4 overflow-x-auto px-6 pb-4 relative z-20">
@@ -127,8 +128,8 @@ function EksplorasiDetail() {
                             key={image.id}
                             onClick={() => setCurrentImage(index)}
                             className={`overflow-hidden rounded-2xl border-4 transition ${currentImage === index
-                                    ? "border-yellow-400"
-                                    : "border-transparent opacity-70 hover:opacity-100"
+                                ? "border-yellow-400"
+                                : "border-transparent opacity-70 hover:opacity-100"
                                 }`}
                         >
                             <img
@@ -239,6 +240,30 @@ function EksplorasiDetail() {
                                 }
 
                             </div>
+                        </div>
+                        {/* MAP */}
+                        <div className="mt-10">
+                            <h3 className="mb-6 font-outfit text-xl font-bold text-gray-900">
+                                Lokasi Destinasi
+                            </h3>
+
+                            <MapView
+                                latitude={Number(destination.latitude)}
+                                longitude={Number(destination.longitude)}
+                                name={destination.name}
+                            />
+                            <button
+                                onClick={() =>
+                                    window.open(
+                                        `https://www.google.com/maps?q=${destination.latitude},${destination.longitude}`,
+                                        "_blank"
+                                    )
+                                }
+                                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-green-500 px-4 py-3 font-semibold text-white transition hover:bg-green-600"
+                            >
+                                <MapPinned className="h-5 w-5" />
+                                Buka di Google Maps
+                            </button>
                         </div>
                     </div>
                 </div>
