@@ -90,6 +90,7 @@ model TouristDestination {
   operatingHours          DestinationOperatingHour[]
   destinationTicketPrices DestinationTicketPrice[]
   images      DestinationImage[]
+  reviews     DestinationReview[]
 
   @@map("tourist_destinations")
 }
@@ -145,4 +146,24 @@ model DestinationImage {
   destination TouristDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
 
   @@map("destination_images")
+}
+
+/// table destination_reviews
+
+model DestinationReview {
+  id            Int      @id @default(autoincrement())
+
+  destinationId Int      @map("destination_id")
+
+  username      String   @db.VarChar(100)
+
+  rating        Int
+
+  comment       String?  @db.Text
+
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  destination TouristDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@map("destination_reviews")
 }

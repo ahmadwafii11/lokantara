@@ -52,12 +52,10 @@ router.get(
 
 // API Slug Destinations
 router.get("/:slug", async (req, res) => {
-
     const { slug } = req.params
 
     const destination =
         await prisma.touristDestination.findUnique({
-
             where: {
                 slug,
             },
@@ -66,10 +64,18 @@ router.get("/:slug", async (req, res) => {
                 images: true,
                 region: true,
                 category: true,
+
                 operatingHours: true,
+
                 destinationTicketPrices: {
                     include: {
                         ticketType: true,
+                    },
+                },
+
+                reviews: {
+                    orderBy: {
+                        createdAt: "desc",
                     },
                 },
             },
