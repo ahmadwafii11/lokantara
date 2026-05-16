@@ -31,4 +31,12 @@ app.use("/api/destinations", destinationRoutes)
 // API ROUTE TOURISM CATEGORY
 app.use("/api/tourismcategories", tourismCategoryRoutes)
 
+// STATIC IMAGE REVIEWS
+app.use(
+    "/images/reviews",
+    express.static(
+        path.join(__dirname, "../public/reviews")
+    )
+)
+
 export default app
