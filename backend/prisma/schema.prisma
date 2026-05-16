@@ -12,13 +12,13 @@ datasource db {
 ///table regions
 
 model Region {
-  id Int @id @default(autoincrement())
+  id         Int @id @default(autoincrement())
 
   regionName String? @map("region_name") @db.VarChar(100)
 
   regionType String? @map("region_type") @db.VarChar(50)
 
-  province String? @db.VarChar(100)
+  province   String? @db.VarChar(100)
 
   destinations TouristDestination[]
 
@@ -28,34 +28,13 @@ model Region {
 //table tourism_category
 
 model TourismCategory {
-  id Int @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
 
   categoryName String @map("category_name") @db.VarChar(100)
 
   destinations TouristDestination[]
 
   @@map("tourism_category")
-}
-
-///table destination_operating_hours
-
-model DestinationOperatingHour {
-  id Int @id @default(autoincrement())
-
-  destinationId Int @map("destination_id")
-
-  dayOfWeek Int @map("day_of_week")
-
-  openTime  DateTime? @map("open_time") @db.Time(0)
-  closeTime DateTime? @map("close_time") @db.Time(0)
-
-  isClosed Boolean @default(false) @map("is_closed")
-
-  is24Hours Boolean @default(false) @map("is_24_hours")
-
-  destination TouristDestination @relation(fields: [destinationId], references: [id])
-
-  @@map("destination_operating_hours")
 }
 
 ///table tourist_destinations
@@ -83,16 +62,37 @@ model TouristDestination {
 
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  region Region @relation(fields: [regionId], references: [id])
+  region Region           @relation(fields: [regionId], references: [id])
 
   category TourismCategory @relation(fields: [categoryId], references: [id])
 
   operatingHours          DestinationOperatingHour[]
   destinationTicketPrices DestinationTicketPrice[]
-  images      DestinationImage[]
-  reviews     DestinationReview[]
+  images                  DestinationImage[]
+  reviews                 DestinationReview[]
 
   @@map("tourist_destinations")
+}
+
+///table destination_operating_hours
+
+model DestinationOperatingHour {
+  id Int @id @default(autoincrement())
+
+  destinationId Int @map("destination_id")
+
+  dayOfWeek Int @map("day_of_week")
+
+  openTime  DateTime? @map("open_time") @db.Time(0)
+  closeTime DateTime? @map("close_time") @db.Time(0)
+
+  isClosed Boolean @default(false) @map("is_closed")
+
+  is24Hours Boolean @default(false) @map("is_24_hours")
+
+  destination TouristDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@map("destination_operating_hours")
 }
 
 ///table ticket_types
@@ -163,7 +163,25 @@ model DestinationReview {
 
   createdAt     DateTime @default(now()) @map("created_at")
 
-  destination TouristDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  destination  TouristDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  image        ReviewImage[]
 
   @@map("destination_reviews")
+}
+
+/// table review_images
+
+model ReviewImage {
+  id         Int      @id @default(autoincrement())
+
+  reviewId   Int      @map("review_id")
+
+  imageUrl   String   @map("image_url")
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  review     DestinationReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@map("review_images")
 }
