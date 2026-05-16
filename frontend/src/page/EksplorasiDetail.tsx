@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { MapPin, MapPinned, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, MapPinned, ChevronLeft, ChevronRight, Star} from "lucide-react";
 import { Link } from "react-router-dom";
 
 import Loading from "../components/Loading";
@@ -11,6 +11,11 @@ function EksplorasiDetail() {
     const [destination, setDestination] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [currentImage, setCurrentImage] = useState(0)
+    const [reviews, setReviews] = useState<any[]>([])
+    const [username, setUsername] = useState("")
+    const [comment, setComment] = useState("")
+    const [rating, setRating] = useState(5)
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
     // UseEffect for Destinations
     useEffect(() => {
@@ -26,11 +31,12 @@ function EksplorasiDetail() {
             })
             .then((data) => {
                 setDestination(data);
+                setReviews(data.reviews || [])
                 setLoading(false);
             })
             .catch((err) => {
                 console.error(err);
-                setLoading(false); // Matikan loading juga jika error/tidak ketemu
+                setLoading(false);
             });
     }, [slug]);
 
@@ -52,7 +58,7 @@ function EksplorasiDetail() {
         )
     }
 
-    const images = destination.images || []
+    const images = destination?.images || []
 
     const nextImage = () => {
         setCurrentImage((prev) =>
@@ -64,6 +70,87 @@ function EksplorasiDetail() {
         setCurrentImage((prev) =>
             prev === 0 ? images.length - 1 : prev - 1
         )
+    }
+
+    const submitReview = async () => {
+
+        // VALIDASI USERNAME
+        if (!username.trim()) {
+            alert(
+                "Nama pengguna wajib diisi sebelum mengirim ulasan!"
+            )
+
+            return
+        }
+
+        // VALIDASI REVIEW
+        const haveRating = rating > 0
+        const haveComment = comment.trim().length > 0
+        const haveImage = selectedFiles.length > 0
+
+        if (!haveRating && !haveComment && !haveImage) {
+
+            alert(
+                "Silakan berikan rating, komentar, atau foto untuk melengkapi ulasan Anda!"
+            )
+
+            return
+        }
+
+        try {
+
+            // FORM DATA
+            const formData = new FormData()
+
+            formData.append("username", username)
+            formData.append("comment", comment)
+            formData.append("rating", rating.toString())
+
+            selectedFiles.forEach((file) => {
+                formData.append("images", file)
+            })
+
+            // SUBMIT REVIEW
+            const response = await fetch(
+                `http://localhost:3000/api/destinations/${slug}/reviews`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            )
+
+            if (!response.ok) {
+                throw new Error("Gagal mengirim review")
+            }
+
+            const data = await response.json()
+
+            console.log(data)
+
+            // REFRESH REVIEW
+            const updatedReviews = await fetch(
+                `http://localhost:3000/api/destinations/${slug}`
+            )
+
+            const destinationData =
+                await updatedReviews.json()
+
+            setReviews(destinationData.reviews)
+
+            // RESET FORM
+            setUsername("")
+            setComment("")
+            setRating(5)
+            setSelectedFiles([])
+
+            alert("Review berhasil dikirim!")
+
+        } catch (error) {
+
+            console.error(error)
+
+            alert("Terjadi kesalahan saat mengirim review")
+        }
     }
 
     return (
@@ -147,7 +234,7 @@ function EksplorasiDetail() {
                 <div className="grid gap-8 lg:grid-cols-3">
 
                     {/* LEFT CONTENT */}
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 space-y-6">
                         <div className="rounded-3xl bg-gray-50 p-8 shadow-sm">
                             <h2 className="font-outfit text-2xl font-bold text-gray-900">
                                 Tentang Destinasi
@@ -155,6 +242,111 @@ function EksplorasiDetail() {
                             <p className="mt-6 leading-8 text-gray-600">
                                 {destination.description}
                             </p>
+                        </div>
+
+                        {/* INPUT REVIIEWS */}
+                        <div className="rounded-3xl bg-white p-8 shadow-sm">
+                            <h2 className="font-outfit text-2xl font-bold">
+                                Berikan Review
+                            </h2>
+
+                            {/* STAR SELECTOR */}
+                            <div className="mt-6 flex gap-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        onClick={() => setRating(star)}
+                                    >
+                                        <Star
+                                            className={`h-7 w-7 ${star <= rating
+                                                ? "fill-yellow-400 text-yellow-400"
+                                                : "text-gray-300"
+                                                }`}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* USERNAME */}
+                            <input
+                                type="text"
+                                placeholder="Nama Anda"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="mt-6 w-full rounded-xl border border-gray-200 p-4 outline-none focus:border-yellow-400"
+                            />
+
+                            {/* IMAGE */}
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => {
+                                    if (!e.target.files) return
+
+                                    setSelectedFiles(
+                                        Array.from(e.target.files)
+                                    )
+                                }}
+                            />
+
+                            {/* COMMENT */}
+                            <textarea
+                                placeholder="Tulis review..."
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                rows={5}
+                                className="mt-4 w-full rounded-xl border border-gray-200 p-4 outline-none focus:border-yellow-400"
+                            />
+
+                            <button
+                                className="mt-4 rounded-xl bg-yellow-400 px-6 py-3 font-semibold text-black hover:bg-yellow-500"
+                                onClick={submitReview}
+                            >
+                                Kirim Review
+                            </button>
+                        </div>
+
+                        {/* REVIEWS */}
+                        <div className="mt-10 space-y-6">
+                            {reviews.map((review) => (
+                                <div
+                                    key={review.id}
+                                    className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-semibold text-gray-900">
+                                            {review.username}
+                                        </h3>
+
+                                        <div className="flex gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    className={`h-5 w-5 ${star <= review.rating
+                                                        ? "fill-yellow-400 text-yellow-400"
+                                                        : "text-gray-300"
+                                                        }`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <div className="mt-4 flex gap-3 overflow-x-auto">
+                                            {review.image.map((image: any) => (
+                                                <img
+                                                    key={image.id}
+                                                    src={`http://localhost:3000${image.imageUrl}`}
+                                                    alt="Review"
+                                                    className="h-24 w-24 rounded-xl object-cover"
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <p className="mt-4 text-gray-600">
+                                        {review.comment}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
@@ -247,11 +439,13 @@ function EksplorasiDetail() {
                                 Lokasi Destinasi
                             </h3>
 
-                            <MapView
-                                latitude={Number(destination.latitude)}
-                                longitude={Number(destination.longitude)}
-                                name={destination.name}
-                            />
+                            <div className="relative z-0 overflow-hidden rounded-xl">
+                                <MapView
+                                    latitude={Number(destination.latitude)}
+                                    longitude={Number(destination.longitude)}
+                                    name={destination.name}
+                                />
+                            </div>
                             <button
                                 onClick={() =>
                                     window.open(
