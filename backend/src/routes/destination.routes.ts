@@ -53,6 +53,77 @@ router.get(
     }
 )
 
+// ROUTE SEARCH FILTER
+router.get("/search", async (req, res) => {
+    const { q, category, province, region } = req.query
+
+    const destinations =
+        await prisma.touristDestination.findMany({
+            where: {
+                AND: [
+                    q
+                        ? {
+                            OR: [
+                                {
+                                    name: {
+                                        contains: String(q),
+                                        mode: "insensitive",
+                                    },
+                                },
+
+                                {
+                                    description: {
+                                        contains: String(q),
+                                        mode: "insensitive",
+                                    },
+                                },
+                            ],
+                        }
+                        : {},
+
+                    category
+                        ? {
+                            category: {
+                                categoryName: {
+                                    equals: String(category),
+                                    mode: "insensitive",
+                                },
+                            },
+                        }
+                        : {},
+
+                    province || region
+                        ? {
+                            region: {
+
+                                province: province
+                                    ? {
+                                        equals: String(province),
+                                        mode: "insensitive",
+                                    }
+                                    : undefined,
+
+                                regionName: region
+                                    ? {
+                                        equals: String(region),
+                                        mode: "insensitive",
+                                    }
+                                    : undefined,
+                            },
+                        }
+                        : {},
+                ],
+            },
+
+            include: {
+                images: true,
+                region: true,
+                category: true,
+            },
+        })
+    res.json(destinations)
+})
+
 // API Slug Destinations
 router.get("/:slug", async (req, res) => {
     const { slug } = req.params
@@ -92,49 +163,49 @@ router.get("/:slug", async (req, res) => {
 
 // API POST REVIEWS 
 router.post("/:slug/reviews", uploadReview.array("images", 5), async (req: Request<{ slug: string }>, res) => {
-        const { slug } = req.params
-        const { username, comment, rating } = req.body
+    const { slug } = req.params
+    const { username, comment, rating } = req.body
 
-        const destination =
-            await prisma.touristDestination.findUnique({
-                where: { 
-                    slug, 
-                }
-            })
+    const destination =
+        await prisma.touristDestination.findUnique({
+            where: {
+                slug,
+            }
+        })
 
-        if (!destination) {
-            return res.status(404).json({
-                message: "Destination tidak ditemukan"
-            })
-        }
-
-        const review =
-            await prisma.destinationReview.create({
-                data: {
-                    username,
-                    comment,
-                    rating: Number(rating),
-                    destinationId: destination.id,
-                }
-            })
-
-        const files = req.files as Express.Multer.File[]
-
-        if (files?.length > 0) {
-
-            await prisma.reviewImage.createMany({
-                data: files.map((file) => ({
-                    reviewId: review.id,
-                    imageUrl:
-                        `/images/reviews/${file.filename}`
-                }))
-            })
-        }
-
-        res.json({
-            message: "Review berhasil ditambahkan"
+    if (!destination) {
+        return res.status(404).json({
+            message: "Destination tidak ditemukan"
         })
     }
+
+    const review =
+        await prisma.destinationReview.create({
+            data: {
+                username,
+                comment,
+                rating: Number(rating),
+                destinationId: destination.id,
+            }
+        })
+
+    const files = req.files as Express.Multer.File[]
+
+    if (files?.length > 0) {
+
+        await prisma.reviewImage.createMany({
+            data: files.map((file) => ({
+                reviewId: review.id,
+                imageUrl:
+                    `/images/reviews/${file.filename}`
+            }))
+        })
+    }
+
+    res.json({
+        message: "Review berhasil ditambahkan"
+    })
+}
 )
 
 export default router
