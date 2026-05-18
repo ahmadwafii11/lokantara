@@ -6,6 +6,7 @@ import { fileURLToPath } from "url"
 
 import destinationRoutes from "./routes/destination.routes"
 import tourismCategoryRoutes from "./routes/tourismCategory.routes"
+import regionRoutes from "./routes/regions.routes"
 
 const app = express()
 
@@ -38,5 +39,8 @@ app.use(
         path.join(__dirname, "../public/reviews")
     )
 )
+
+// API GET REGIONS
+app.use("/api", regionRoutes)
 
 export default app
