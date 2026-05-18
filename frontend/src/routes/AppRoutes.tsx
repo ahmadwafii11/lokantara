@@ -1,11 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
+import Disclaimer from "../components/Disclaimer";
+
 
 import Beranda from "../page/Beranda";
 import Eksplorasi from "../page/Eksplorasi";
 import EksplorasiDetail from "../page/EksplorasiDetail";
-
-import Disclaimer from "../components/Disclaimer";
+import EksplorasiSearch from "../page/EksplorasiSearch";
+import RegisterPage from "../page/Register";
+import LoginPage from "../page/Login";
 
 function AppRoutes() {
     return(
@@ -37,6 +41,12 @@ function AppRoutes() {
                         <EksplorasiDetail />
                         <Disclaimer />
                     </>
+                }
+                />
+                <Route
+                path="/eksplorasi/search"
+                element={
+                    <EksplorasiSearch/>
                 }
                 />
             </Routes>
