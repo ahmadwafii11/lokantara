@@ -21,6 +21,7 @@ model Region {
   province   String? @db.VarChar(100)
 
   destinations TouristDestination[]
+  stops        TransportStop[]
 
   @@map("regions")
 }
@@ -184,4 +185,83 @@ model ReviewImage {
   review     DestinationReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
   @@map("review_images")
+}
+
+/// table transport_stop_categories
+
+model TransportStopCategory {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique @map("category_transport_stop") @db.VarChar(100)
+
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt      @map("updated_at")
+
+  stops       TransportStop[]
+
+  @@map("transport_stop_categories")
+}
+
+/// table transport_stops
+
+model TransportStop {
+  id              Int                     @id @default(autoincrement())
+
+  categoryId      Int                     @map("category_id")
+  region_id       Int                     @map("region_id")
+
+  name            String                  @db.VarChar(255)
+  slug            String                  @unique               @db.VarChar(255)
+  description     String?                 @db.Text
+  code            String?                 @db.VarChar(10)
+
+  address         String?                 @db.Text
+  latitude        Decimal?                @db.Decimal(10, 8)
+  longitude       Decimal?                @db.Decimal(11, 8)
+  location        Unsupported("geography(Point, 4326)")?
+
+  createdAt       DateTime                @default(now())       @map("created_at")
+  updatedAt       DateTime                @updatedAt            @map("updated_at")
+
+  category        TransportStopCategory   @relation(fields: [categoryId], references: [id])
+  region          Region                  @relation(fields: [region_id], references: [id])
+
+  @@map("transport_stops")
+}
+
+/// table transportation_categories
+
+model TransportationCategory {
+  id              Int                     @id @default(autoincrement())
+
+  name            String                  @unique @map("category_transport") @db.VarChar(100)
+
+  createdAt       DateTime                @default(now())   @map("created_at")
+  updatedAt       DateTime                @updatedAt        @map("updated_at")
+
+  transportations Transportation[]
+
+  @@map("transportation_categories")
+}
+
+/// table transportation
+
+model Transportation {
+  id                  Int                         @id @default(autoincrement())
+
+  categoryId          Int
+
+  name                String                      @db.VarChar(255)
+  slug                String                      @unique            @db.VarChar(255)
+  type                String?
+  operator            String?
+  description         String?                     @db.Text
+
+  capacity            Int?
+
+  createdAt           DateTime                    @default(now())    @map("created_at")
+  updatedAt           DateTime                    @updatedAt         @map("updated_at")
+
+  category            TransportationCategory      @relation(fields: [categoryId], references: [id])
+
+  @@map("transportations")
 }
