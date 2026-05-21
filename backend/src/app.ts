@@ -7,6 +7,8 @@ import { fileURLToPath } from "url"
 import destinationRoutes from "./routes/destination.routes"
 import tourismCategoryRoutes from "./routes/tourismCategory.routes"
 import regionRoutes from "./routes/regions.routes"
+import transportStopCategoryRoutes from "./routes/transportStopCategory.routes"
+import transportStopRoutes from "./routes/transportStop.routes"
 
 const app = express()
 
@@ -26,12 +28,6 @@ app.use(
     )
 )
 
-// API ROUTE DESTINATIONS
-app.use("/api/destinations", destinationRoutes)
-
-// API ROUTE TOURISM CATEGORY
-app.use("/api/tourismcategories", tourismCategoryRoutes)
-
 // STATIC IMAGE REVIEWS
 app.use(
     "/images/reviews",
@@ -39,6 +35,18 @@ app.use(
         path.join(__dirname, "../public/reviews")
     )
 )
+
+// API ROUTE DESTINATIONS
+app.use("/api/destinations", destinationRoutes)
+
+// API ROUTE TOURISM CATEGORY
+app.use("/api/tourismcategories", tourismCategoryRoutes)
+
+// API ROUTE TRANSPORT STOP CATEGORY
+app.use("/api/transportstopcategories", transportStopCategoryRoutes)
+
+// API ROUTE TRANSPORT STOP
+app.use("/api/transportstop", transportStopRoutes)
 
 // API GET REGIONS
 app.use("/api", regionRoutes)
