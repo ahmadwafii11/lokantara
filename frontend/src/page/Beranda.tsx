@@ -11,7 +11,7 @@ function Beranda() {
             }}
         >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black/60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/80 via-indigo-950/40 via-[60%]to-white" />
 
             {/* Content */}
             <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center text-white">
