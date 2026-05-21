@@ -8,8 +8,7 @@ import Beranda from "../page/Beranda";
 import Eksplorasi from "../page/Eksplorasi";
 import EksplorasiDetail from "../page/EksplorasiDetail";
 import EksplorasiSearch from "../page/EksplorasiSearch";
-import RegisterPage from "../page/Register";
-import LoginPage from "../page/Login";
+import Transportasi from "../page/Transportasi";
 
 function AppRoutes() {
     return(
@@ -47,6 +46,12 @@ function AppRoutes() {
                 path="/eksplorasi/search"
                 element={
                     <EksplorasiSearch/>
+                }
+                />
+                <Route
+                path="/transportasi"
+                element={
+                    <Transportasi/>
                 }
                 />
             </Routes>
