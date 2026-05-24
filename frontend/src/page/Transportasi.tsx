@@ -1,40 +1,134 @@
 import { JSX, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Search, Bus, Train, Plane, ShipWheel, Shapes, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, Bus, Train, Plane, ShipWheel, Shapes, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
 import imageBackground from "../assets/background-transportation-1.jpg"
 
 function Transportasi() {
-    const { filter } = useParams()
     const navigate = useNavigate()
 
-    const [filters, setFilters] = useState<any[]>([]);
-    const [transportStop, setTransportStop] = useState<any[]>([]);
+    const [filterTransportStops, setFilterTransportStops] = useState<any[]>([]);
+    const [filterTransports, setFilterTransports] = useState<any[]>([]);
 
-    const transportFilters: Record<string, JSX.Element> = {
-        Stasiun: <Train className="h-4 w-4" />,
-        Terminal: <Bus className="h-4 w-4" />,
-        Halte: <Bus className="h-4 w-4" />,
-        Bandara: <Plane className="h-4 w-4" />,
-        Pelabuhan: <ShipWheel className="h-4 w-4" />,
+    const [transportStop, setTransportStop] = useState<any[]>([]);
+    const [transport, setTransport] = useState<any[]>([]);
+
+    const [activeCategory, setActiveCategory] = useState<string>("Semua");
+    const [activeCategoryTransport, setActiveCategoryTransport] = useState<string>("Semua");
+
+    // --- STATE PAGINATION ---
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 9;
+
+    const getTransportStopIcon = (category: string) => {
+        switch (category) {
+            case "Stasiun" : 
+                return <Train className="h-4 w-4"/>;
+            case "Terminal":
+                return <Bus className="h-4 w-4" />;
+            case "Halte": 
+                return <Bus className="h-4 w-4" />;
+            case "Bandara": 
+                return <Plane className="h-4 w-4" />;
+            case "Pelabuhan": 
+                return <ShipWheel className="h-4 w-4" />;
+            default:
+                return <Shapes className="h-4 w-4" />
+        }
     }
 
-    // useEffect for filter button
+    const getTransportIcon = (category: string) => {
+        switch (category) {
+            case "Kereta Api":
+                return <Train className="h-4 w-4" />;
+            case "Surabaya Bus":
+                return <Bus className="h-4 w-4" />;
+            case "TransJatim":
+                return <Bus className="h-4 w-4" />;
+            default:
+                return <Shapes className="h-4 w-4" />;
+        }
+    };
+
+    // UseEffect for reset pagination
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeCategory]);
+
+    // useEffect for filter button TransportStops
     useEffect(() => {
         fetch("http://localhost:3000/api/transportstopcategories")
             .then((res) => res.json())
-            .then((data) => setFilters(data));
+            .then((data) => setFilterTransportStops(data));
+    }, [])
+
+    // useEffect for filter button Transports
+    useEffect(() => {
+        fetch("http://localhost:3000/api/transportscategories")
+            .then((res) => res.json())
+            .then((data) => setFilterTransports(data));
+    }, [])
+
+    // useEffect for filter button Transports
+    useEffect(() => {
+        fetch("http://localhost:3000/api/transportcategories")
+            .then((res) => res.json())
+            .then((data) => setFilterTransports(data));
     }, [])
 
     // useEffect for section transportstop
     useEffect(() => {
-        const url = filter
-            ? `http://localhost:3000/api/transportstop/transportstopcategories/${filter}`
-            : "http://localhost:3000/api/transportstop"
-        fetch(url)
+        fetch("http://localhost:3000/api/transportstops")
             .then((res) => res.json())
             .then((data) => setTransportStop(data))
-    }, [filter]);
+    }, []);
+
+    // useEffect for section transportations
+    useEffect(() => {
+        fetch("http://localhost:3000/api/transports")
+            .then((res) => res.json())
+            .then((data) => setTransport(data))
+    }, []);
+
+    // Logic filter TransportStop
+    const filteredTransportStop =
+        activeCategory === "Semua"
+            ? transportStop
+            : transportStop.filter(
+                (item: any) =>
+                    item.category?.name === activeCategory
+            );
+
+    // Logic filter Transport
+    const filteredTransport =
+        activeCategoryTransport === "Semua"
+            ? transport
+            : transport.filter(
+                (item: any) =>
+                    item.category?.name === activeCategoryTransport
+            );
+
+    // Logic slice data for pagination
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+    const currentItems = filteredTransportStop.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredTransportStop.length / itemsPerPage);
+
+    const currentItemsTransport = filteredTransport.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPagesTransport = Math.ceil(filteredTransport.length / itemsPerPage);
+
+    // Construct list page number transport stop
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+    }
+
+    // Construct list page number transport 
+    const pageNumbersTransport = [];
+    for (let i = 1; i <= totalPagesTransport; i++) {
+        pageNumbersTransport.push(i);
+    }
 
     return (
         <>
@@ -68,7 +162,7 @@ function Transportasi() {
                                     <Search className="h-5 w-5 text-gray-300" />
                                     <input
                                         type="text"
-                                        placeholder="Cari transportasi..."
+                                        placeholder="Cari stasiun, terminal, kota, atau rute..."
                                         className="w-full bg-transparent py-3 text-white outline-none placeholder:text-gray-400"
                                     />
                                 </div>
@@ -79,94 +173,107 @@ function Transportasi() {
                                     Cari
                                 </button>
                             </div>
-
-                            {/* FILTERS */}
-                            <div className="mt-8 flex flex-wrap gap-3 overflow-x-auto pb-4">
-                                {filters.map((filter: any) => (
-                                    <button
-                                        key={filter.id}
-                                        onClick={() =>
-                                            navigate(
-                                                `/transportasi/search?category=${filter.name.toLowerCase()}`
-                                            )
-                                        }
-                                        className="flex flex-shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-sm transition hover:bg-yellow-400 hover:text-black"
-                                    >
-                                        {
-                                            transportFilters[filter.name]
-                                            ||
-                                            <Shapes className="h4-w-4" />
-                                        }
-                                        {filter.name}
-                                    </button>
-                                ))}
-                            </div>
                         </div>
                     </div>
                 </section>
 
                 {/* Transportations Stop */}
                 <section className="mx-auto max-w-7xl px-6 py-20">
-                    <div className="mb-10 flex items-end justify-between">
+                    <div className="mb-10 flex flex-col gap-6 justify-between">
                         <div>
                             <h2 className="font-outfit text-3xl font-bold text-gray-900 md:text-4xl">
-                                Tempat Pemberhentian Populer
+                                Tempat Pemberhentian
                             </h2>
                             <div className="mt-2 h-1 w-20 rounded-full bg-yellow-400" />
                         </div>
-                        <button className="text-sm font-semibold text-emerald-600 transition hover:text-emerald-800">
-                            Lihat Semua
-                        </button>
+
+                        {/* FILTER CATEGORY */}
+                        <div className="flex flex-wrap gap-3">
+
+                            {/* ALL BUTTON */}
+                            <button
+                                onClick={() => setActiveCategory("Semua")}
+                                className={`rounded-2xl px-5 py-2.5 text-sm font-semibold transition
+                                    ${activeCategory === "Semua"
+                                        ? "bg-yellow-400 text-black shadow-md"
+                                        : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                                    }
+                                `}
+                            >
+                                Semua
+                            </button>
+
+                            {/* BUTTON CATEGORY */}
+                            {filterTransportStops.map((filter: any) => (
+                                <button
+                                    key={filter.id}
+                                    onClick={() => setActiveCategory(filter.name)}
+                                    className={`flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold transition
+                                        ${activeCategory === filter.name
+                                            ? "bg-yellow-400 text-black shadow-md"
+                                            : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                                        }
+                                    `}
+                                >
+                                    {getTransportStopIcon(filter.name)}
+
+                                    {filter.name}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
+                    {/* GRID CARD */}
                     <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {transportStop.map((transportStop: any) => {
-                            // const image = destination.images?.[0];
+                        {currentItems.map((item: any) => {
+                            const image = item.images?.[0];
                             return (
                                 <div
-                                    key={transportStop.id}
-                                    className="group cursor-pointer rounded-3xl border border-gray-100 bg-white shadow-sm transition hover:shadow-xl"
+                                    key={item.id}
+                                    className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
                                 >
-
                                     {/* IMAGE */}
-                                    {/* <div className="relative overflow-hidden rounded-t-3xl">
+                                    <div className="relative h-64 overflow-hidden">
                                         <img
-                                            src={
-                                                image
-                                                    ? `http://localhost:3000${image.imageUrl}`
-                                                    : "https://placehold.co/600x400"
-                                            }
-                                            alt={destination.name}
-                                            className="aspect-video w-full object-cover transition duration-500 group-hover:scale-110"
+                                            src={image ? `http://localhost:3000${image.imageUrl}` : "https://placehold.co/600x400"}
+                                            alt={item.name}
+                                            className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                                         />
-                                        <div className="absolute top-4 right-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-gray-900 backdrop-blur-sm">
-                                            Terpopuler
+
+                                        {/* BADGE AREA */}
+                                        <div className="absolute top-4 left-4 flex items-center gap-2">
+
+                                            {/* BADGE CATEGORY */}
+                                            <div className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-gray-900 shadow-sm backdrop-blur-sm select-none">
+                                                {item.category?.name}
+                                            </div>
+
+                                            {/* BADGE CODE */}
+                                            {item.code && (
+                                                <div className="rounded-xl bg-emerald-600 px-2 py-0.5 text-[10px] font-mono font-bold text-white shadow-md uppercase tracking-wider animate-in fade-in duration-300">
+                                                    {item.code}
+                                                </div>
+                                            )}
+
                                         </div>
-                                    </div> */}
+                                        <div className="absolute bottom-4 right-4 rounded-full bg-white/70 px-2.5 py-0.5 text-[10px] font-medium text-gray-700 backdrop-blur-sm shadow-sm">
+                                            © {image?.copyright || "Google Maps"}
+                                        </div>
+                                    </div>
 
                                     {/* CONTENT */}
-                                    <div className="p-6">
-                                        <h3 className="font-outfit text-xl font-bold text-gray-900 transition group-hover:text-emerald-700">
-                                            {transportStop.name}
-                                        </h3>
-                                        <div className="mt-2 flex items-center gap-2 text-gray-500">
-                                            <MapPin className="h-4 w-4 text-red-500"
-                                            />
-                                            <p className="text-sm font-medium">
-                                                {
-                                                    transportStop.region
-                                                        ?.regionName
-                                                }
-                                            </p>
+                                    <div className="space-y-4 p-6">
+                                        <h3 className="font-outfit text-xl font-bold text-gray-900">{item.name}</h3>
+                                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                                            <MapPin className="h-4 w-4 text-rose-500" />
+                                            <span>{item.region?.name || "Banyuwangi"}</span>
                                         </div>
+                                        <p className="line-clamp-2 text-sm text-gray-600 leading-relaxed">
+                                            {item.description}
+                                        </p>
                                         <button
-                                            key={transportStop.id}
-                                            onClick={() =>
-                                                navigate(
-                                                    `/transportasi/${transportStop.slug}`
-                                                )
-                                            }
-                                            className="mt-6 w-full rounded-xl bg-gray-50 py-3 font-semibold text-gray-900 transition hover:bg-yellow-400"
+                                            onClick={() => navigate(`/transportasi/detail/${item.id}`)}
+                                            className="w-full rounded-xl bg-gray-50 py-3 text-center text-sm font-semibold text-gray-900 transition hover:bg-yellow-400 hover:text-black"
                                         >
                                             Lihat Detail
                                         </button>
@@ -175,6 +282,160 @@ function Transportasi() {
                             );
                         })}
                     </div>
+
+                    {/* PAGINATION CONTROLS */}
+                    {totalPages > 1 &&
+                        <div className="mt-16 flex items-center justify-center gap-2">
+
+                            {/* BUTTON PREV */}
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent"
+                            >
+                                <ChevronLeft className="h-5 w-5" />
+                            </button>
+
+                            {/* NUMBER PAGE */}
+                            {pageNumbers.map((number) => (
+                                <button
+                                    key={number}
+                                    onClick={() => setCurrentPage(number)}
+                                    className={`h-10 px-4 rounded-xl text-sm font-semibold transition ${currentPage === number
+                                        ? "bg-yellow-400 text-gray-900 shadow-sm"
+                                        : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                                        }`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+
+                            {/* BUTTON NEXT */}
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent"
+                            >
+                                <ChevronRight className="h-5 w-5" />
+                            </button>
+                        </div>
+                    }
+                </section>
+
+                {/* Transportations Type */}
+                <section className="mx-auto max-w-7xl px-6 py-20">
+                    <div className="mb-10 flex flex-col gap-6 justify-between">
+                        <div>
+                            <h2 className="font-outfit text-3xl font-bold text-gray-900 md:text-4xl">
+                                Jenis Transportasi
+                            </h2>
+                            <div className="mt-2 h-1 w-20 rounded-full bg-yellow-400" />
+                        </div>
+
+                        {/* FILTER CATEGORY */}
+                        <div className="flex flex-wrap gap-3">
+
+                            {/* BUTTON SEMUA */}
+                            <button
+                                onClick={() => setActiveCategoryTransport("Semua")}
+                                className={`rounded-2xl px-5 py-2.5 text-sm font-semibold transition
+                                    ${activeCategoryTransport === "Semua"
+                                        ? "bg-yellow-400 text-black shadow-md"
+                                        : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                                    }
+                                `}
+                            >
+                                Semua
+                            </button>
+
+                            {/* BUTTON CATEGORY */}
+                            {filterTransports.map((filter: any) => (
+                                <button
+                                    key={filter.id}
+                                    onClick={() => setActiveCategoryTransport(filter.name)}
+                                    className={`flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold transition
+                                        ${activeCategoryTransport === filter.name
+                                            ? "bg-yellow-400 text-black shadow-md"
+                                            : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                                        }
+                                    `}
+                                >
+                                    {getTransportIcon(filter.name)}
+
+                                    {filter.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* GRID CARD */}
+                    <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                        {currentItemsTransport.map((item: any) => {
+                            return (
+                                <div
+                                    key={item.id}
+                                    className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                                >
+
+                                    {/* CONTENT */}
+                                    <div className="space-y-4 p-6">
+                                        <h3 className="font-outfit text-xl font-bold text-gray-900">{item.name}</h3>
+                                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                                            <MapPin className="h-4 w-4 text-rose-500" />
+                                            {/* <span>{item.region?.name || "Banyuwangi"}</span> */}
+                                        </div>
+                                        <p className="line-clamp-2 text-sm text-gray-600 leading-relaxed">
+                                            {item.description}
+                                        </p>
+                                        <button
+                                            onClick={() => navigate(`/transportasi/detail/${item.id}`)}
+                                            className="w-full rounded-xl bg-gray-50 py-3 text-center text-sm font-semibold text-gray-900 transition hover:bg-yellow-400 hover:text-black"
+                                        >
+                                            Lihat Detail
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* PAGINATION CONTROLS */}
+                    {totalPages > 1 &&
+                        <div className="mt-16 flex items-center justify-center gap-2">
+
+                            {/* BUTTON PREV */}
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent"
+                            >
+                                <ChevronLeft className="h-5 w-5" />
+                            </button>
+
+                            {/* NUMBER PAGE */}
+                            {pageNumbersTransport.map((number) => (
+                                <button
+                                    key={number}
+                                    onClick={() => setCurrentPage(number)}
+                                    className={`h-10 px-4 rounded-xl text-sm font-semibold transition ${currentPage === number
+                                        ? "bg-yellow-400 text-gray-900 shadow-sm"
+                                        : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                                        }`}
+                                >
+                                    {number}
+                                </button>
+                            ))}
+
+                            {/* BUTTON NEXT */}
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent"
+                            >
+                                <ChevronRight className="h-5 w-5" />
+                            </button>
+                        </div>
+                    }
                 </section>
             </div>
         </>
