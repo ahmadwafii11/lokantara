@@ -36,6 +36,14 @@ app.use(
     )
 )
 
+// STATIC IMAGE TRANSPORT STOP
+app.use(
+    "/images/transport-stops",
+    express.static(
+        path.join(__dirname, "../public/transport-stops")
+    )
+)
+
 // API ROUTE DESTINATIONS
 app.use("/api/destinations", destinationRoutes)
 
@@ -46,8 +54,7 @@ app.use("/api/tourismcategories", tourismCategoryRoutes)
 app.use("/api/transportstopcategories", transportStopCategoryRoutes)
 
 // API ROUTE TRANSPORT STOP
-app.use("/api/transportstop", transportStopRoutes)
-
+app.use("/api/transportstops", transportStopRoutes)
 // API GET REGIONS
 app.use("/api", regionRoutes)
 

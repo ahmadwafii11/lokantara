@@ -10,6 +10,7 @@ router.get("/", async (req, res) => {
     const transportStop = 
         await prisma.transportStop.findMany({
             include: {
+                images: true,
                 region: true,
                 category: true,
             },
