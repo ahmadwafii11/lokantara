@@ -1,6 +1,11 @@
-import { JSX, useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Bus, Train, Plane, ShipWheel, Shapes, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
+
+import type { Transport } from "../types/transport";
+import type { TransportStop } from "../types/transportStop";
+import type { TransportStopCategories } from "../types/transportStopCategory";
+import type { TransportCategories } from "../types/transportCategory";
 
 import { getAllTransportations, getAllTransportationStop, getAllTransportationStopCategory, getAllTransportationCategory } from "../services/api";
 
@@ -9,14 +14,14 @@ import Loading from "../components/Loading";
 
 import imageBackground from "../assets/background-transportation-1.jpg"
 
-function Transportasi() {
+function Transportasi(): ReactElement {
     const navigate = useNavigate()
 
-    const [filterTransportStops, setFilterTransportStops] = useState<any[]>([]);
-    const [filterTransports, setFilterTransports] = useState<any[]>([]);
+    const [filterTransportStops, setFilterTransportStops] = useState<TransportStopCategories[]>([]);
+    const [filterTransports, setFilterTransports] = useState<TransportCategories[]>([]);
 
-    const [transportStop, setTransportStop] = useState<any[]>([]);
-    const [transport, setTransport] = useState<any[]>([]);
+    const [transportStop, setTransportStop] = useState<TransportStop[]>([]);
+    const [transport, setTransport] = useState<Transport[]>([]);
 
     const [loading, setLoading] = useState<boolean>(true);
 
