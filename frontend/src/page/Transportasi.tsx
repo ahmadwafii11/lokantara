@@ -2,6 +2,11 @@ import { JSX, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Bus, Train, Plane, ShipWheel, Shapes, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 
+import { getAllTransportations, getAllTransportationStop, getAllTransportationStopCategory, getAllTransportationCategory } from "../services/api";
+
+import Loading from "../components/Loading";
+
+
 import imageBackground from "../assets/background-transportation-1.jpg"
 
 function Transportasi() {
@@ -12,6 +17,8 @@ function Transportasi() {
 
     const [transportStop, setTransportStop] = useState<any[]>([]);
     const [transport, setTransport] = useState<any[]>([]);
+
+    const [loading, setLoading] = useState<boolean>(true);
 
     const [activeCategory, setActiveCategory] = useState<string>("Semua");
     const [activeCategoryTransport, setActiveCategoryTransport] = useState<string>("Semua");
@@ -55,40 +62,38 @@ function Transportasi() {
         setCurrentPage(1);
     }, [activeCategory]);
 
-    // useEffect for filter button TransportStops
+    // useEffect get API Data 
     useEffect(() => {
-        fetch("http://localhost:3000/api/transportstopcategories")
-            .then((res) => res.json())
-            .then((data) => setFilterTransportStops(data));
+        setLoading(true);
+
+        Promise.all([
+            getAllTransportationCategory(),
+            getAllTransportationStopCategory(),
+            getAllTransportations(),
+            getAllTransportationStop()
+        ])
+        .then(([categoriesTransportationData, 
+                categoriesTransportationStopData,
+                transportationsData,
+                transportationStopData,
+            ]) => 
+                {
+                    setFilterTransports(categoriesTransportationData);
+                    setFilterTransportStops(categoriesTransportationStopData);
+                    setTransport(transportationsData);
+                    setTransportStop(transportationStopData);
+
+                    setLoading(false);
+        })
+        .catch((err) => {
+        console.error("Salah satu API gagal dimuat:", err);
+        setLoading(false);
+        });
     }, [])
 
-    // useEffect for filter button Transports
-    useEffect(() => {
-        fetch("http://localhost:3000/api/transportscategories")
-            .then((res) => res.json())
-            .then((data) => setFilterTransports(data));
-    }, [])
-
-    // useEffect for filter button Transports
-    useEffect(() => {
-        fetch("http://localhost:3000/api/transportcategories")
-            .then((res) => res.json())
-            .then((data) => setFilterTransports(data));
-    }, [])
-
-    // useEffect for section transportstop
-    useEffect(() => {
-        fetch("http://localhost:3000/api/transportstops")
-            .then((res) => res.json())
-            .then((data) => setTransportStop(data))
-    }, []);
-
-    // useEffect for section transportations
-    useEffect(() => {
-        fetch("http://localhost:3000/api/transports")
-            .then((res) => res.json())
-            .then((data) => setTransport(data))
-    }, []);
+    if (loading) {
+        return <Loading message="Sedang mencari data..." variant="fullscreen" />;
+    }
 
     // Logic filter TransportStop
     const filteredTransportStop =
