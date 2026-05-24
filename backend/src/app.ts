@@ -8,7 +8,9 @@ import destinationRoutes from "./routes/destination.routes"
 import tourismCategoryRoutes from "./routes/tourismCategory.routes"
 import regionRoutes from "./routes/regions.routes"
 import transportStopCategoryRoutes from "./routes/transportStopCategory.routes"
+import transportationCategoryRoutes from "./routes/transportationCategory.routes"
 import transportStopRoutes from "./routes/transportStop.routes"
+import transportationRoutes from "./routes/transportation.routes"
 
 const app = express()
 
@@ -55,6 +57,13 @@ app.use("/api/transportstopcategories", transportStopCategoryRoutes)
 
 // API ROUTE TRANSPORT STOP
 app.use("/api/transportstops", transportStopRoutes)
+
+// API ROUTE TRANSPORTATION CATEGORY
+app.use("/api/transportscategories", transportationCategoryRoutes)
+
+// API ROUTE TRANSPORTATION
+app.use("/api/transports", transportationRoutes)
+
 // API GET REGIONS
 app.use("/api", regionRoutes)
 
