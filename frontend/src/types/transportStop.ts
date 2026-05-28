@@ -9,7 +9,9 @@ export interface TransportStop {
     };
 
     region?: {
-        name: string;
+        regionName: string;
+        regionType: string;
+        province: string;
     };
 
     images?: {
