@@ -138,7 +138,7 @@ function TransportServiceSection(): ReactElement {
                                         <span>
                                             {item.route?.map((route) => (
                                                 <span key={route.id}>
-                                                    {route.originStop.name} - {route.destinationStop.name}
+                                                    {route.originStop.name} - {route.destinationStop.name} ({route.route_name})
                                                 </span>
                                             ))}
                                         </span>
