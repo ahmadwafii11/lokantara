@@ -8,9 +8,15 @@ const router = Router()
 router.get("/", async (req, res) => {
 
     const transport = 
-        await prisma.transportation.findMany({
+        await prisma.transportationService.findMany({
             include: {
                 category: true,
+                route: {
+                    include:{
+                        originStop: true,
+                        destinationStop: true
+                    }
+                }
             },
         })
     
