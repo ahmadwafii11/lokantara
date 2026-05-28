@@ -187,6 +187,9 @@ model ReviewImage {
   @@map("review_images")
 }
 
+/// RELATION TABLE TRANSPORT
+
+
 /// table transport_stop_categories
 
 model TransportStopCategory {
@@ -222,7 +225,10 @@ model TransportStop {
   createdAt       DateTime                @default(now())       @map("created_at")
   updatedAt       DateTime                @updatedAt            @map("updated_at")
 
-  images          TransportStopImage[]
+  images           TransportStopImage[]
+  originRoute      TransportationRoute[]   @relation("RouteOrigin")
+  destinationRoute TransportationRoute[]   @relation("RouteDestination")
+
 
   category        TransportStopCategory   @relation(fields: [categoryId], references: [id])
   region          Region                  @relation(fields: [region_id], references: [id])
@@ -259,30 +265,86 @@ model TransportationCategory {
   createdAt       DateTime                @default(now())   @map("created_at")
   updatedAt       DateTime                @updatedAt        @map("updated_at")
 
-  transportations Transportation[]
+  services        TransportationService[]
 
   @@map("transportation_categories")
 }
 
-/// table transportation
+/// table transportation_types 
 
-model Transportation {
-  id                  Int                         @id @default(autoincrement())
+model TransportationType {
+  id              Int                     @id @default(autoincrement())
 
-  categoryId          Int
+  name            String                  @unique @map("type_transport") @db.VarChar(100)
 
-  name                String                      @db.VarChar(255)
-  slug                String                      @unique            @db.VarChar(255)
-  type                String?
-  operator            String?
-  description         String?                     @db.Text
+  createdAt       DateTime                @default(now())     @map("created_at")
+  updatedAt       DateTime                @updatedAt          @map("updated_at")
 
-  capacity            Int?
+  services        TransportationService[]
 
-  createdAt           DateTime                    @default(now())    @map("created_at")
-  updatedAt           DateTime                    @updatedAt         @map("updated_at")
+  @@map("transportation_types")
+}
 
-  category            TransportationCategory      @relation(fields: [categoryId], references: [id])
+/// table transportation_operators
 
-  @@map("transportations")
+model TransportationOperator {
+  id              Int                     @id @default(autoincrement())
+
+  name            String                  @db.VarChar(100)
+  slug            String                  @unique
+
+  description     String?
+
+  cratedAt        DateTime                @default(now())  @map("created_at") 
+  updatedAt       DateTime                @updatedAt       @map("updated_at")
+
+  services        TransportationService[]
+
+  @@map("transportation_operators")
+}
+
+/// table transportation_services
+
+model TransportationService {
+  id              Int                     @id @default(autoincrement())
+
+  categoryId      Int                     @map("category_id")
+  typeId          Int                     @map("type_id")
+  operatorId      Int                     @map("operator_id")
+
+  name            String                  @db.VarChar(255)
+  slug            String                  @unique               @db.VarChar(150)
+  description     String?                 @db.Text
+
+  createdAt       DateTime                @default(now())       @map("created_at")
+  updatedAt       DateTime                @updatedAt            @map("updated_at")
+
+  route           TransportationRoute[]
+
+  category        TransportationCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  type            TransportationType      @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  operator        TransportationOperator  @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+
+  @@map("transportation_services")
+}
+
+/// table transportation_route
+
+model TransportationRoute {
+  id                   Int                     @id @default(autoincrement())
+
+  serviceId          Int                       @map("service_id")
+  originStopId       Int                       @map("origin_stop_id")
+  destinationStopId  Int                       @map("destination_stop_id")
+
+  route_name         String                    @db.VarChar(255)
+
+  cratedAt           DateTime                  @default(now())      @map("created_at")
+  updatedAt          DateTime                  @updatedAt           @map("updated_at")
+
+  service            TransportationService     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  originStop         TransportStop             @relation("RouteOrigin", fields: [originStopId], references: [id], onDelete: Cascade)
+  destinationStop    TransportStop             @relation("RouteDestination", fields: [destinationStopId], references: [id], onDelete: Cascade)
+
+  @@map("transportation_route")
 }
