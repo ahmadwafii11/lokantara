@@ -8,7 +8,7 @@ interface PaginationProps<T> {
 
 type PageNumber = number | string;
 
-const MAX_VISIBLE_PAGES = 7;
+const MAX_VISIBLE_PAGES = 5;
 
 function usePagination<T>({data,currentPage,itemsPerPage}: PaginationProps<T>) {
     
