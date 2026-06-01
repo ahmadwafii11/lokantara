@@ -1,7 +1,7 @@
 import { useState, useEffect, type ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { MapPin } from "lucide-react";
+import { Route } from "lucide-react";
 
 import type { TransportService } from "../../types/transportService";
 import type { TransportCategories } from "../../types/transportCategory";
@@ -29,7 +29,7 @@ function TransportServiceSection(): ReactElement {
         setLoading(true);
 
         Promise.all([
-            getAllTransportations(), 
+            getAllTransportations(),
             getAllTransportationCategory()
         ])
             .then(([
@@ -53,7 +53,7 @@ function TransportServiceSection(): ReactElement {
     }, [activeCategory]);
 
     // Logic filter TransportService
-    const filteredTransportService = useMemo (() => {
+    const filteredTransportService = useMemo(() => {
         return activeCategory === "Semua"
             ? transportServices
             : transportServices.filter(
@@ -61,16 +61,16 @@ function TransportServiceSection(): ReactElement {
                     item.category?.name === activeCategory
             );
     }, [transportServices, activeCategory])
-    
+
     // PAGINATION HOOKS
     const { currentItems, totalPages, pageNumbers } = usePagination({
         data: filteredTransportService,
         currentPage,
         itemsPerPage: ITEMS_PER_PAGE,
     });
-    
+
     if (loading) {
-        return<Loading message="Sedang mencari data..." variant="card"/>
+        return <Loading message="Sedang mencari data..." variant="card" />
     };
 
     return (
@@ -131,27 +131,53 @@ function TransportServiceSection(): ReactElement {
                             >
 
                                 {/* CONTENT */}
-                                <div className="space-y-4 p-6">
-                                    <h3 className="font-outfit text-xl font-bold text-gray-900">{item.name}</h3>
-                                    <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                                        <MapPin className="h-4 w-4 text-rose-500" />
-                                        <span>
-                                            {item.route?.map((route) => (
-                                                <span key={route.id}>
-                                                    {route.originStop.name} - {route.destinationStop.name} ({route.route_name})
+                                <div className="space-y-5 p-6">
+
+                                    {/* HEADER */}
+                                    <div>
+                                        <h3 className="font-outfit text-xl font-bold text-gray-900">
+                                            {item.name}
+                                        </h3>
+
+                                        <div className="mt-3 flex flex-wrap gap-2">
+
+                                            {/* CATEGORY */}
+                                            <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                                                {item.category?.name}
+                                            </span>
+
+                                            {/* TYPE */}
+                                            {item.type?.name && (
+                                                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                                    {item.type?.name}
                                                 </span>
-                                            ))}
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* STATS */}
+                                    <div className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
+
+                                        <Route className="h-4 w-4 text-yellow-500" />
+
+                                        <span className="text-sm font-medium text-gray-700">
+                                            {item.route?.length ?? 0} Rute Aktif
                                         </span>
                                     </div>
-                                    <p className="line-clamp-2 text-sm text-gray-600 leading-relaxed">
+
+                                    {/* DESCRIPTION */}
+                                    <p className="line-clamp-3 text-sm leading-relaxed text-gray-600">
                                         {item.description}
                                     </p>
+
+                                    {/* BUTTON */}
                                     <button
                                         onClick={() => navigate(`/transportasi/detail/${item.id}`)}
-                                        className="w-full rounded-xl bg-gray-50 py-3 text-center text-sm font-semibold text-gray-900 transition hover:bg-yellow-400 hover:text-black"
+                                        className="w-full rounded-xl bg-gray-100 py-3 text-sm font-semibold text-gray-900 transition hover:bg-yellow-400 hover:text-black"
                                     >
                                         Lihat Detail
                                     </button>
+
                                 </div>
                             </div>
                         );
