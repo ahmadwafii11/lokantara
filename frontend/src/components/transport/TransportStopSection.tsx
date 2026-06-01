@@ -161,6 +161,10 @@ function TransportStopSection(): ReactElement {
                                             </div>
                                         )}
                                     </div>
+                                    {/* COPYRIGHT */}
+                                    <div className="absolute bottom-4 right-4 rounded-full bg-white/80 px-3 py-1 text-[10px] font-medium text-gray-700 shadow-sm backdrop-blur-sm">
+                                        © {image?.copyright ?? "Google Maps"}
+                                    </div>
                                 </div>
 
                                 {/* CONTENT */}
